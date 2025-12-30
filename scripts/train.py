@@ -1,4 +1,7 @@
-
+"""
+Training script implementing the full training loop:
+data loading, tokenizer initialization, training, and checkpoint saving.
+"""
 import os
 import sys
 
