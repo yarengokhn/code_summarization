@@ -88,3 +88,27 @@ The configuration includes:
 - tokenization limits
 - training hyperparameters
 - generation settings
+
+## Evaluation
+
+The trained model was evaluated on a held-out test set.
+
+Metric:
+- Test Loss (CrossEntropy): **4.54**
+
+The result confirms that the model successfully learned to generate short textual summaries
+and that the full training–evaluation–inference pipeline works as expected.
+
+## Inference
+
+The inference script demonstrates qualitative results by comparing:
+
+- input code snippets
+- model-predicted summaries
+- reference summaries
+
+Example output is produced by running:
+
+```bash
+python scripts/infer.py
+
