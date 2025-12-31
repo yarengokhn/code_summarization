@@ -3,5 +3,5 @@ __pycache__/
 .ipynb_checkpoints
 checkpoints/
 data/python/
-training_log.csv
+# training_log.csv
 *.pt

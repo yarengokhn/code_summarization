@@ -80,6 +80,12 @@ def main(args):
     print("\n--- Final Metrics ---")
     print(json.dumps(metrics, indent=4))
 
+    # Save metrics to JSON
+    os.makedirs("results", exist_ok=True)
+    with open("results/metrics.json", "w") as f:
+        json.dump(metrics, f, indent=4)
+    print("Metrics saved to results/metrics.json")
+
 if __name__ == "__main__":
     import yaml
     
