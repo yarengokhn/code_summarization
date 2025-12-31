@@ -24,7 +24,15 @@ engine = None
 def init_engine():
     global engine
     print("Initializing Inference Engine...")
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    # Device selection with MPS support
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
+    
     print(f"Using device: {device}")
     
     # Load config
@@ -37,34 +45,44 @@ def init_engine():
     n_layers = config.get('n_layers', 1)
     dropout = config.get('dropout', 0.5)
     
+    # Model name - use local_run_v1 (the recently trained model)
+    model_name = "local_run_v1"
+    
     # Load Vocabs
     try:
-        code_vocab = load_vocab("checkpoints/improved_v1_code_vocab.pkl")
-        summary_vocab = load_vocab("checkpoints/improved_v1_summary_vocab.pkl")
+        code_vocab = load_vocab(f"checkpoints/{model_name}_code_vocab.pkl")
+        summary_vocab = load_vocab(f"checkpoints/{model_name}_summary_vocab.pkl")
+        print(f"Loaded vocabularies for {model_name}")
     except FileNotFoundError:
-        print("Vocab files not found. Inference will fail.")
-        return
+        print(f"Vocab files for {model_name} not found. Trying fallback...")
+        try:
+            code_vocab = load_vocab("checkpoints/code_vocab.pkl")
+            summary_vocab = load_vocab("checkpoints/summary_vocab.pkl")
+            print("Loaded default vocabularies")
+        except FileNotFoundError:
+            print("Vocab files not found. Inference will fail.")
+            return
 
     code_tokenizer = Tokenizer(is_code=True)
     
     # Init Model
-    print("Loading vocabularies...")
+    print("Building model architecture...")
     attn = Attention(hid_dim)
     enc = Encoder(len(code_vocab), emb_dim, hid_dim, n_layers, dropout)
     dec = Decoder(len(summary_vocab), emb_dim, hid_dim, n_layers, dropout, attn)
     model = Seq2Seq(enc, dec, device).to(device)
     
     # Load Weights
-    print("Loading model weights...")
-    checkpoint_path = "checkpoints/improved_v1.pt"
+    print(f"Loading model weights from {model_name}...")
+    checkpoint_path = f"checkpoints/{model_name}.pt"
     if os.path.exists(checkpoint_path):
         model.load_state_dict(torch.load(checkpoint_path, map_location=device))
-        print("Model weights loaded.")
+        print(f"✓ Model weights loaded successfully from {checkpoint_path}")
     else:
-        print("Model weights not found. Inference will produce untrained results.")
+        print(f"⚠ Model weights not found at {checkpoint_path}. Using untrained model.")
 
     engine = InferenceEngine(model, code_vocab, summary_vocab, code_tokenizer, device)
-    print("Inference Engine ready.")
+    print("✓ Inference Engine ready!")
 
 @app.route('/')
 def index():

@@ -1,0 +1,106 @@
+/Users/nat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Using device: mps
+Code Vocab Size: 153511
+Summary Vocab Size: 41466
+/Users/nat/Library/Python/3.9/lib/python/site-packages/torch/nn/modules/rnn.py:123: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.5 and num_layers=1
+  warnings.warn(
+Starting training for 5 epochs (Patience: 3)...
+Batch 0/3571 Loss: 10.6759
+Batch 100/3571 Loss: 6.5659
+Batch 200/3571 Loss: 6.0852
+Batch 300/3571 Loss: 6.0217
+Batch 400/3571 Loss: 5.9857
+Batch 500/3571 Loss: 5.6666
+Batch 600/3571 Loss: 5.7891
+Batch 700/3571 Loss: 6.1949
+Batch 800/3571 Loss: 6.1483
+Batch 900/3571 Loss: 6.0187
+Batch 1000/3571 Loss: 5.9803
+Batch 1100/3571 Loss: 6.1247
+Batch 1200/3571 Loss: 5.2716
+Batch 1300/3571 Loss: 5.4858
+Batch 1400/3571 Loss: 6.0805
+Batch 1500/3571 Loss: 5.2322
+Batch 1600/3571 Loss: 5.6183
+Batch 1700/3571 Loss: 4.9942
+Batch 1800/3571 Loss: 5.6222
+Batch 1900/3571 Loss: 5.6630
+Batch 2000/3571 Loss: 5.6395
+Batch 2100/3571 Loss: 5.3506
+Batch 2200/3571 Loss: 5.3371
+Batch 2300/3571 Loss: 5.0612
+Batch 2400/3571 Loss: 5.0408
+Batch 2500/3571 Loss: 5.5064
+Batch 2600/3571 Loss: 5.2180
+Batch 2700/3571 Loss: 5.7616
+Batch 2800/3571 Loss: 4.1224
+Batch 2900/3571 Loss: 4.9667
+Batch 3000/3571 Loss: 5.1128
+Batch 3100/3571 Loss: 5.6986
+Batch 3200/3571 Loss: 5.0121
+Batch 3300/3571 Loss: 5.4175
+Batch 3400/3571 Loss: 5.2583
+Batch 3500/3571 Loss: 5.5912
+Epoch: 01 | Time: 197m 32s *
+	Train Loss: 5.518 | Train PPL: 249.081
+	 Val. Loss: 5.668 |  Val. PPL: 289.409 (Best: 5.668)
+Batch 0/3571 Loss: 4.8417
+Batch 100/3571 Loss: 4.5968
+Batch 200/3571 Loss: 4.9792
+Batch 300/3571 Loss: 4.6534
+Batch 400/3571 Loss: 4.8752
+Batch 500/3571 Loss: 4.9985
+Batch 600/3571 Loss: 4.6455
+Batch 700/3571 Loss: 4.6801
+Batch 800/3571 Loss: 4.9256
+Batch 900/3571 Loss: 4.6012
+Batch 1000/3571 Loss: 4.6810
+Batch 1100/3571 Loss: 4.9535
+Batch 1200/3571 Loss: 4.4263
+Batch 1300/3571 Loss: 4.7307
+Batch 1400/3571 Loss: 4.5223
+Batch 1500/3571 Loss: 4.9139
+Batch 1600/3571 Loss: 4.9911
+Batch 1700/3571 Loss: 4.8444
+Batch 1800/3571 Loss: 4.7405
+Batch 1900/3571 Loss: 4.6677
+Batch 2000/3571 Loss: 4.8484
+Batch 2100/3571 Loss: 4.5457
+Batch 2200/3571 Loss: 4.9464
+Batch 2300/3571 Loss: 4.6760
+Batch 2400/3571 Loss: 4.4550
+Batch 2500/3571 Loss: 4.4644
+Batch 2600/3571 Loss: 4.5593
+Batch 2700/3571 Loss: 4.8189
+Batch 2800/3571 Loss: 4.5107
+Batch 2900/3571 Loss: 4.5035
+Batch 3000/3571 Loss: 4.5285
+Batch 3100/3571 Loss: 4.5124
+Batch 3200/3571 Loss: 4.3738
+Batch 3300/3571 Loss: 4.6041
+Batch 3400/3571 Loss: 4.5560
+Batch 3500/3571 Loss: 4.3739
+Epoch: 02 | Time: 190m 3s *
+	Train Loss: 4.653 | Train PPL: 104.913
+	 Val. Loss: 5.595 |  Val. PPL: 269.106 (Best: 5.595)
+Batch 0/3571 Loss: 3.4160
+Batch 100/3571 Loss: 3.8424
+Batch 200/3571 Loss: 4.2234
+Batch 300/3571 Loss: 4.0738
+Batch 400/3571 Loss: 3.8168
+Batch 500/3571 Loss: 4.5664
+Traceback (most recent call last):
+  File "/Users/nat/Documents/machine_learning_group_project/scripts/train.py", line 189, in <module>
+    main(args)
+  File "/Users/nat/Documents/machine_learning_group_project/scripts/train.py", line 99, in main
+    train_loss = train_epoch(model, train_loader, optimizer, criterion, args.clip, device)
+  File "/Users/nat/Documents/machine_learning_group_project/src/train_loop.py", line 29, in train_epoch
+    loss.backward()
+  File "/Users/nat/Library/Python/3.9/lib/python/site-packages/torch/_tensor.py", line 647, in backward
+    torch.autograd.backward(
+  File "/Users/nat/Library/Python/3.9/lib/python/site-packages/torch/autograd/__init__.py", line 354, in backward
+    _engine_run_backward(
+  File "/Users/nat/Library/Python/3.9/lib/python/site-packages/torch/autograd/graph.py", line 829, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+KeyboardInterrupt

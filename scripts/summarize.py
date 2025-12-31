@@ -14,15 +14,28 @@ from models.seq2seq import Seq2Seq
 from src.inference import InferenceEngine
 
 def main(args):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Device selection with MPS support
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
+    
+    print(f"Using device: {device}")
     
     # Load Vocabs
     try:
-        code_vocab = load_vocab("checkpoints/code_vocab.pkl")
-        summary_vocab = load_vocab("checkpoints/summary_vocab.pkl")
+        code_vocab = load_vocab(f"checkpoints/{args.model_name}_code_vocab.pkl")
+        summary_vocab = load_vocab(f"checkpoints/{args.model_name}_summary_vocab.pkl")
     except FileNotFoundError:
-        print("Vocab files not found. Please train the model first.")
-        return
+        try:
+            # Fallback to default
+            code_vocab = load_vocab("checkpoints/code_vocab.pkl")
+            summary_vocab = load_vocab("checkpoints/summary_vocab.pkl")
+        except FileNotFoundError:
+            print(f"Vocab files for {args.model_name} not found. Please train the model first.")
+            return
 
     code_tokenizer = Tokenizer(is_code=True)
     
@@ -33,10 +46,12 @@ def main(args):
     model = Seq2Seq(enc, dec, device).to(device)
     
     # Load Weights
-    if os.path.exists("checkpoints/best_model.pt"):
-        model.load_state_dict(torch.load("checkpoints/best_model.pt", map_location=device))
+    checkpoint_path = f"checkpoints/{args.model_name}.pt"
+    if os.path.exists(checkpoint_path):
+        model.load_state_dict(torch.load(checkpoint_path, map_location=device))
+        print(f"Loaded model: {args.model_name}")
     else:
-        print("Model weights not found. Please train the model first.")
+        print(f"Model weights not found at {checkpoint_path}. Please train the model first.")
         return
 
     engine = InferenceEngine(model, code_vocab, summary_vocab, code_tokenizer, device)
@@ -52,6 +67,7 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=str, help="Path to YAML config file")
+    parser.add_argument("--model_name", type=str, default="local_run_v1", help="Name of the model to use")
     parser.add_argument("--input", type=str, help="Python function to summarize")
     parser.add_argument("--emb_dim", type=int, default=256)
     parser.add_argument("--hid_dim", type=int, default=512)
