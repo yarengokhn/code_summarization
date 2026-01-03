@@ -1,19 +1,23 @@
 import re
 
-
-def preprocess_code(text,is_Code=True):
-    if text is None: return ""
-  
-    if is_Code:
-        # Yorumları kaldır
+def preprocess_code(text, is_code=True):
+    if text is None or text == "": 
+        return ""
+    
+    if is_code:
+        # Remove comments 
         text = re.sub(r'#.*', '', text)
-        # Fazla boşlukları kaldır
+        
+        # Remove excessive whitespace while preserving structure
         text = re.sub(r'\s+', ' ', text).strip()
-        text = text.replace('\n', '').strip()
-  # 3. CamelCase ve snake_case parçalama (Tokenization öncesi anlamı güçlendirir)
-    if is_Code:
-        # Örn: calculateAverageScore -> calculate Average Score
+        
+        # CamelCase splitting: calculateBLUE -> calculate BLUE
         text = re.sub('([a-z0-9])([A-Z])', r'\1 \2', text)
-        # Örn: calculate_average -> calculate average
+        
+        # Snake_case splitting: calculate_blue -> calculate blue
         text = text.replace('_', ' ')
-    return text.lower() # Modelin öğrenmesini kolaylaştırmak için küçük harf
+    else:
+        # For summaries, just normalize whitespace
+        text = re.sub(r'\s+', ' ', text).strip()
+    
+    return text.lower()
