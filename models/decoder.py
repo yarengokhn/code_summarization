@@ -1,3 +1,5 @@
+import torch
+import torch.nn as nn
 
 class AttentionDecoder(nn.Module):
     def __init__(self, vocab_size, embedding_dim, enc_hidden_dim, dec_hidden_dim, n_layers=2, dropout=0.3):
