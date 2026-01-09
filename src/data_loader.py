@@ -3,7 +3,8 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 from datasets import load_dataset, DatasetDict
 from transformers import AutoTokenizer
-import preprocess_code from preprocessing
+from preprocessing import  preprocess_code
+
 
 # 1. Load the dataset (currently only has 'train' split)
 raw_dataset = load_dataset("Nan-Do/code-search-net-python")
