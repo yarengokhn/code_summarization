@@ -4,7 +4,10 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 from datasets import load_dataset, DatasetDict
 from transformers import AutoTokenizer
-from data_preprocessing import preprocess_code
+try:
+    from .data_preprocessing import preprocess_code
+except ImportError:
+    from data_preprocessing import preprocess_code
 
 
 # 1. Load the dataset (currently only has 'train' split)
