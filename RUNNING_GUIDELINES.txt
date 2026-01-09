@@ -1,0 +1,222 @@
+================================================================================
+                    CODE SUMMARIZATION - RUNNING GUIDELINES
+================================================================================
+
+This document provides step-by-step instructions for training and running the
+code summarization model.
+
+================================================================================
+PREREQUISITES
+================================================================================
+
+1. Python 3.9+ installed
+2. All dependencies installed:
+   pip install -r requirements.txt
+
+3. Dataset available at: data/dataset.csv
+   (Should contain 'code' and 'summary' columns)
+
+================================================================================
+TRAINING THE MODEL
+================================================================================
+
+Basic Training Command:
+-----------------------
+python3 scripts/train.py --data_path data/dataset.csv --model_name local_run_v1 --epochs 5 --batch_size 16
+
+Training with Custom Parameters:
+--------------------------------
+python3 scripts/train.py \
+    --data_path data/dataset.csv \
+    --model_name my_model \
+    --epochs 10 \
+    --batch_size 32 \
+    --lr 0.001 \
+    --patience 3 \
+    --emb_dim 256 \
+    --hid_dim 512 \
+    --n_layers 1 \
+    --dropout 0.5
+
+Training with Config File:
+-------------------------
+python3 scripts/train.py --config configs/base.yaml --model_name my_model
+
+Training with Live Logs (Recommended):
+--------------------------------------
+python3 -u scripts/train.py --data_path data/dataset.csv --model_name local_run_v1 --epochs 5 --batch_size 16 > training_output.txt 2>&1
+
+Then monitor in another terminal:
+tail -f training_output.txt
+
+Training Parameters Explained:
+------------------------------
+--data_path         : Path to CSV file with 'code' and 'summary' columns
+--model_name        : Name for saving model checkpoints (default: best_model)
+--epochs            : Number of training epochs (default: 10)
+--batch_size        : Batch size for training (default: 32)
+--lr                : Learning rate (default: 0.001)
+--patience          : Early stopping patience (default: 3)
+--emb_dim           : Embedding dimension (default: 256)
+--hid_dim           : Hidden dimension (default: 512)
+--n_layers          : Number of LSTM layers (default: 1)
+--dropout           : Dropout rate (default: 0.5)
+--clip              : Gradient clipping value (default: 1.0)
+
+Output Files After Training:
+----------------------------
+- checkpoints/{model_name}.pt                    : Model weights
+- checkpoints/{model_name}_code_vocab.pkl        : Code vocabulary
+- checkpoints/{model_name}_summary_vocab.pkl     : Summary vocabulary
+- training_log.csv                               : Epoch-by-epoch metrics
+
+================================================================================
+EVALUATING THE MODEL
+================================================================================
+
+Evaluate on Test Set:
+--------------------
+python3 scripts/evaluate.py --model_name local_run_v1 --test_data data/test_sample.csv
+
+Evaluate with CodeSearchNet:
+---------------------------
+python3 scripts/evaluate.py --model_name local_run_v1 --use_codesearchnet --csn_limit 100
+
+Output:
+-------
+- Prints sample predictions to console
+- Saves metrics to: results/metrics.json
+- Metrics include: BLEU, ROUGE-1, ROUGE-2, ROUGE-L
+
+================================================================================
+RUNNING THE WEB UI
+================================================================================
+
+Start the Flask Web Interface:
+------------------------------
+python3 app.py
+
+The server will start on: http://127.0.0.1:5003
+
+Features:
+---------
+- Paste Python code into the text area
+- Click "Summarize" to generate AI summary
+- Uses your trained model (local_run_v1 by default)
+- Runs on Mac GPU (MPS) if available
+
+To Change Model in UI:
+----------------------
+Edit app.py, line 28:
+    model_name = "your_model_name"
+
+Then restart:
+    python3 app.py
+
+================================================================================
+COMMAND-LINE INFERENCE
+================================================================================
+
+Summarize a Single Function:
+----------------------------
+python3 scripts/summarize.py --input "def add(a, b): return a + b"
+
+Using a Specific Model:
+-----------------------
+python3 scripts/summarize.py --model_name local_run_v1 --input "def multiply(x, y): return x * y"
+
+================================================================================
+VERIFICATION & TESTING
+================================================================================
+
+Verify Data Pipeline:
+--------------------
+python3 scripts/verify_data.py
+
+This will:
+- Load 10 samples from dataset.csv
+- Show preprocessing steps
+- Display batch shapes
+- Decode sample batches
+
+Plot Training Results:
+---------------------
+python3 scripts/plot_results.py --log_file training_log.csv --output_file training_plot.png
+
+================================================================================
+TYPICAL WORKFLOW
+================================================================================
+
+1. TRAIN THE MODEL
+   ----------------
+   python3 -u scripts/train.py --data_path data/dataset.csv --model_name my_model --epochs 5 --batch_size 16 > training_output.txt 2>&1
+   
+   Monitor progress:
+   tail -f training_output.txt
+
+2. EVALUATE PERFORMANCE
+   --------------------
+   python3 scripts/evaluate.py --model_name my_model --test_data data/test_sample.csv
+
+3. TEST INTERACTIVELY
+   ------------------
+   python3 scripts/summarize.py --model_name my_model --input "def example(): pass"
+
+4. LAUNCH WEB UI
+   -------------
+   Edit app.py to set model_name = "my_model"
+   python3 app.py
+   Open http://127.0.0.1:5003
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Issue: "Vocab files not found"
+Solution: Make sure you trained with the same --model_name you're using for inference
+
+Issue: Training is slow
+Solution: 
+- Reduce batch_size (e.g., --batch_size 8)
+- Use fewer samples for testing first
+- Ensure MPS/CUDA is being used (check "Using device: mps" in logs)
+
+Issue: Out of memory
+Solution:
+- Reduce batch_size
+- Reduce emb_dim and hid_dim
+- Use CPU instead of GPU (slower but more memory)
+
+Issue: Model produces poor summaries
+Solution:
+- Train for more epochs (5-10 minimum)
+- Check training loss is decreasing
+- Verify data quality in dataset.csv
+- Try different hyperparameters
+
+================================================================================
+CURRENT BEST MODEL
+================================================================================
+
+Model Name: local_run_v1
+Training: 2 epochs on full dataset.csv
+Performance:
+- Train Loss: 4.653
+- Valid Loss: 5.595
+- ROUGE-1 F1: 0.190
+- ROUGE-L F1: 0.174
+
+Location:
+- checkpoints/local_run_v1.pt
+- checkpoints/local_run_v1_code_vocab.pkl
+- checkpoints/local_run_v1_summary_vocab.pkl
+
+================================================================================
+ADDITIONAL RESOURCES
+================================================================================
+
+- System Architecture: SYSTEM_ARCHITECTURE.md
+- Evaluation Report: EVALUATION_REPORT.md
+- Project README: README.md
+
+================================================================================
