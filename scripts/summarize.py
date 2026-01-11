@@ -7,7 +7,7 @@ from transformers import AutoTokenizer
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from models import Encoder, AttentionDecoder, Seq2Seq
-from src.preprocessing import preprocess_code
+from src.data_preprocessing import preprocess_code
 
 # --- Setup ---
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

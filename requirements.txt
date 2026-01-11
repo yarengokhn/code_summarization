@@ -1,3 +1,6 @@
 torch
 transformers
 datasets
+fastapi
+uvicorn
+python-multipart

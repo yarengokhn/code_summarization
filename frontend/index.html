@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Summarizer | AI-Powered Logic Analysis</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Code Summarizer</h1>
+            <p class="subtitle">Transform complex code into clear language</p>
+        </header>
+
+        <main>
+            <div class="input-section card">
+                <div class="card-header">
+                    <span>Python Code</span>
+                    <div class="status-dot tooltip" id="api-status">
+                        <span class="tooltiptext">API Status</span>
+                    </div>
+                </div>
+                <textarea id="code-input" placeholder="def process_data(data):
+    results = []
+    for item in data:
+        if item.valid:
+            results.append(item.value)
+    return results"></textarea>
+                <button id="summarize-btn">
+                    <span class="btn-text">Summarize</span>
+                    <div class="loader" id="loader"></div>
+                </button>
+            </div>
+
+            <div class="output-section card">
+                <div class="card-header">
+                    <span>AI Analysis</span>
+                </div>
+                <div id="output-text" class="placeholder-text">
+                    Your summary will appear here...
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Powered by Seq2Seq Attention Model & FastAPI</p>
+        </footer>
+    </div>
+
+    <script>
+        const summarizeBtn = document.getElementById('summarize-btn');
+        const codeInput = document.getElementById('code-input');
+        const outputText = document.getElementById('output-text');
+        const loader = document.getElementById('loader');
+        const btnText = summarizeBtn.querySelector('.btn-text');
+        const apiStatus = document.getElementById('api-status');
+
+        async function checkHealth() {
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    apiStatus.classList.add('online');
+                } else {
+                    apiStatus.classList.add('warning');
+                }
+            } catch (e) {
+                apiStatus.classList.add('offline');
+            }
+        }
+
+        checkHealth();
+
+        summarizeBtn.addEventListener('click', async () => {
+            const code = codeInput.value.trim();
+            if (!code) return;
+
+            // UI State
+            summarizeBtn.disabled = true;
+            btnText.style.opacity = '0';
+            loader.style.display = 'block';
+            outputText.classList.add('loading-fade');
+
+            try {
+                const response = await fetch('http://localhost:8000/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code }),
+                });
+
+                if (!response.ok) throw new Error('API Error');
+
+                const data = await response.json();
+                outputText.innerText = data.summary;
+                outputText.classList.remove('placeholder-text', 'loading-fade');
+            } catch (error) {
+                outputText.innerText = 'Error: Could not reach the summarization API. Make sure the backend is running.';
+                outputText.classList.add('error-text');
+            } finally {
+                summarizeBtn.disabled = false;
+                btnText.style.opacity = '1';
+                loader.style.display = 'none';
+                outputText.classList.remove('loading-fade');
+            }
+        });
+    </script>
+</body>
+</html>
