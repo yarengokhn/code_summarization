@@ -45,33 +45,24 @@ code_summarization/
 
 ## 💻 Usage
 
-### 1. Training the Model
+### 1. Training and Evaluating the Model
 To train the model from scratch using the dataset (default: CodeSearchNet):
 ```bash
 python scripts/train.py
 ```
 
+To evaluate the model on the test set:
+```bash
+python scripts/evaluate.py
+```
 
 ### 2. Command Line Inference
 To summarize code directly from the terminal:
 ```bash
-python scripts/summarize.py
+python scripts/summarize.py --input "def my_function(x, y): return x + y"
 ```
-*Follow the interactive prompts to enter code snippets.*
 
-### 3. Running the Web Application
-The application consists of a backend API and a frontend.
-
-**Start the Backend:**
-```bash
-uvicorn api.main:app --reload
-```
-The API will run at `http://localhost:8000`.
-
-**Open the Frontend:**
-Simply open `frontend/index.html` in your web browser. You can drag and drop the file into Chrome/Edge or use a live server extension.
-
-## 🎯 Running on Kaggle (Recommended)
+### 3. Running on Kaggle (Recommended)
 **This is the recommended approach as the training process utilizes GPU acceleration.**
 
 The project includes a ready-to-use Kaggle notebook for easy execution with GPU support.
@@ -96,13 +87,13 @@ The project includes a ready-to-use Kaggle notebook for easy execution with GPU 
    - Simply execute the cells in order
 
 
-## 🧠 Model Architecture
+### 4. Model Architecture
 - **Input**: Source code tokens (truncated/padded to 128 tokens).
 - **Encoder**: Bidirectional LSTM using CodeBERT embeddings.
 - **Decoder**: LSTM with Attention mechanism to generate natural language summaries.
 - **Optimization**: AdamW optimizer with CrossEntropyLoss.
 
-## 📝 Requirements
+### 5. Requirements
 - Python 3.8+
 - PyTorch
 - Transformers (Hugging Face)
