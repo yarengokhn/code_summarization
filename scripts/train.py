@@ -132,9 +132,9 @@ EMB_DIM = 128
 HID_DIM = 128
 CLIP = 1.0
 
-TRAIN_SIZE = 150000
-VALID_SIZE = 15000
-NUM_EPOCHS = 10
+TRAIN_SIZE = 5000
+VALID_SIZE = 500
+NUM_EPOCHS = 1
 
 subset_train = tokenized_dataset['train'].select(range(TRAIN_SIZE))  
 subset_valid = tokenized_dataset['validation'].select(range(VALID_SIZE)) 
