@@ -1,4 +1,4 @@
-# AI Code Summarization
+# Machine Learning Project: Code Summarization
 
 This project implementsa code summarization tool that automatically generates natural language descriptions for Python code snippets. It uses a Seq2Seq model with Attention mechanism and Pre-trained CodeBERT embeddings, served via a FastAPI backend and a modern web interface.
 
@@ -70,6 +70,31 @@ The API will run at `http://localhost:8000`.
 
 **Open the Frontend:**
 Simply open `frontend/index.html` in your web browser. You can drag and drop the file into Chrome/Edge or use a live server extension.
+
+## 🎯 Running on Kaggle (Recommended)
+**This is the recommended approach as the training process utilizes GPU acceleration.**
+
+The project includes a ready-to-use Kaggle notebook for easy execution with GPU support.
+
+1. **Find the Notebook**: The notebook is located at `notebooks/ml-project-run-on-kaggle.ipynb` in the repository.
+
+2. **Upload to Kaggle**:
+   - Go to [Kaggle](https://www.kaggle.com/)
+   - Upload the `ml-project-run-on-kaggle.ipynb` file
+
+3. **Enable GPU**:
+   - In your Kaggle notebook settings (right sidebar)
+   - Under "Accelerator", select "GPU T4 x2" or any available GPU
+   - Click "Save"
+
+4. **Run the Notebook**:
+   - The notebook will automatically:
+     - Clone the repository
+     - Install dependencies
+     - Download the dataset
+     - Train the model with GPU acceleration
+   - Simply execute the cells in order
+
 
 ## 🧠 Model Architecture
 - **Input**: Source code tokens (truncated/padded to 128 tokens).
