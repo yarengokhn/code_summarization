@@ -589,7 +589,3 @@ Dataset (Hugging Face)
 - **Optimizer:** AdamW
 
 ---
-
-**Last Updated:** January 2026  
-**Model Type:** Seq2Seq with Bidirectional LSTM + Attention  
-**License:** MIT
