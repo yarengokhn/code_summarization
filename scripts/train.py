@@ -11,9 +11,14 @@ from torch.nn.utils.rnn import pad_sequence
 # Add parent directory to path for module imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+src_path = os.path.join(project_root, 'src')
+sys.path.insert(0, src_path)
+sys.path.insert(0, project_root)
+
 from models import Encoder, AttentionDecoder, Seq2Seq
-from src.data_loader import tokenized_dataset, tokenizer
-from src.data_preprocessing import preprocess_code
+from data_loader import tokenized_dataset, tokenizer
+from data_preprocessing import preprocess_code
 
 # ============ COLLATE FUNCTION ============
 def collate_fn(batch):
@@ -43,12 +48,11 @@ def train_epoch(model, iterator, optimizer, criterion, clip, scaler):
         optimizer.zero_grad()
         
         # Mixed precision forward pass
-        # Use enabled=True/False based on device to prevent errors on CPU/MPS if not supported
-        device_type = 'cuda' if torch.cuda.is_available() else 'cpu'
-        with torch.amp.autocast(device_type, enabled=torch.cuda.is_available()):
+        # Use enabled=True/False based on device to prevent errors on CPU
+        with torch.amp.autocast('cuda' if torch.cuda.is_available() else 'cpu', enabled=torch.cuda.is_available()):
             output = model(src, trg, teacher_forcing_ratio=0.5)
             
-            # Loss hesaplama
+            # Loss
             output_dim = output.shape[-1]
             output = output.reshape(-1, output_dim)
             trg = trg[:, 1:].reshape(-1)
@@ -69,13 +73,12 @@ def train_epoch(model, iterator, optimizer, criterion, clip, scaler):
         
         epoch_loss += loss.item()
         
-        # Progress göstergesi
+        # Progress
         if (i + 1) % 50 == 0:
             elapsed = time.time() - start_time
             avg_loss = epoch_loss / (i + 1)
             print(f'  Batch {i+1}/{len(iterator)} | Loss: {avg_loss:.3f} | Time: {elapsed:.1f}s')
         
-        # Bellek temizliği
         del output, loss
         if (i + 1) % 100 == 0 and torch.cuda.is_available():
             torch.cuda.empty_cache()
@@ -84,7 +87,7 @@ def train_epoch(model, iterator, optimizer, criterion, clip, scaler):
 
 # ============ EVALUATION FUNCTION ============
 def evaluate(model, iterator, criterion):
-    """Validation/Test fonksiyonu"""
+    
     model.eval()
     epoch_loss = 0
     
@@ -94,11 +97,10 @@ def evaluate(model, iterator, criterion):
             trg = batch['labels'].to(DEVICE)
             
             # Mixed precision evaluation
-            device_type = 'cuda' if torch.cuda.is_available() else 'cpu'
-            with torch.amp.autocast(device_type, enabled=torch.cuda.is_available()):
+            with torch.amp.autocast('cuda' if torch.cuda.is_available() else 'cpu', enabled=torch.cuda.is_available()):
                 output = model(src, trg, teacher_forcing_ratio=0)
                 
-                # Loss hesaplama
+                # Loss 
                 output_dim = output.shape[-1]
                 output = output.reshape(-1, output_dim)
                 trg = trg[:, 1:].reshape(-1)
@@ -111,13 +113,7 @@ def evaluate(model, iterator, criterion):
 
 # ============ MAIN TRAINING ============
 # Device setup
-if torch.cuda.is_available():
-    DEVICE = torch.device("cuda")
-elif torch.backends.mps.is_available():
-    DEVICE = torch.device("mps")
-else:
-    DEVICE = torch.device("cpu")
-
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"🚀 Training on {DEVICE}...")
 
 # Cleaning memory 
@@ -132,9 +128,9 @@ EMB_DIM = 128
 HID_DIM = 128
 CLIP = 1.0
 
-TRAIN_SIZE = 5000
-VALID_SIZE = 500
-NUM_EPOCHS = 1
+TRAIN_SIZE = 150000
+VALID_SIZE = 15000
+NUM_EPOCHS = 10
 
 subset_train = tokenized_dataset['train'].select(range(TRAIN_SIZE))  
 subset_valid = tokenized_dataset['validation'].select(range(VALID_SIZE)) 
@@ -198,16 +194,7 @@ for epoch in range(NUM_EPOCHS):
     # Save best model
     if valid_loss < best_valid_loss:
         best_valid_loss = valid_loss
-        checkpoint = {
-            'state_dict': model.state_dict(),
-            'hyperparameters': {
-                'input_dim': INPUT_DIM,
-                'emb_dim': EMB_DIM,
-                'hid_dim': HID_DIM,
-                'output_dim': OUTPUT_DIM
-            }
-        }
-        torch.save(checkpoint, 'models/model.pkl')
+        torch.save(model.state_dict(), 'models/best-model.pt')
         print(f'  💾 Best model saved! (Val Loss: {valid_loss:.3f})')
     
     print()  # Empty line
@@ -219,8 +206,7 @@ print(f'{"="*60}')
 
 # Quick inference test
 print("\n🧪 Testing inference...")
-checkpoint = torch.load('models/model.pkl', map_location=DEVICE)
-model.load_state_dict(checkpoint['state_dict'])
+model.load_state_dict(torch.load('models/best-model.pt'))
 model.eval()
 
 test_code = "def add(x, y): return x + y"
