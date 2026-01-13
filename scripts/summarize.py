@@ -2,6 +2,7 @@ import torch
 import sys
 import os
 from transformers import AutoTokenizer
+import argparse
 
 # Add parent directory to path for module imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -64,26 +65,26 @@ def summarize(code, model, tokenizer, device, max_len=50):
 
 # --- Main Execution ---
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Code Summarization')
+    parser.add_argument('--input', type=str, help='Code snippet to summarize')
+    args = parser.parse_args()
+    
     if os.path.exists(MODEL_PATH):
         print(f"Loading model from {MODEL_PATH}...")
         try:
             model, tokenizer = load_model()
             print("Model loaded successfully!")
             
-            # Example 1: Simple function
-            code1 = "def add(x, y): return x + y"
-            print(f"\nCode: {code1}")
-            print(f"Summary: {summarize(code1, model, tokenizer, DEVICE)}")
-            
-            # Interactive mode
-            print("\nEnter Python code to summarize (type 'q' to quit):")
-            while True:
-                user_input = input("\n> ")
-                if user_input.lower() in ['q', 'quit']:
-                    break
-                print(f"Summary: {summarize(user_input, model, tokenizer, DEVICE)}")
+            if args.input:
+
+                print(f"\nCode: {args.input}")
+                print(f"Summary: {summarize(args.input, model, tokenizer, DEVICE)}")
+            else:
+                code1 = "def add(x, y): return x + y"
+                print(f"\nCode: {code1}")
+                print(f"Summary: {summarize(code1, model, tokenizer, DEVICE)}")
                 
         except Exception as e:
             print(f"Error loading model: {e}")
     else:
-        print(f"Model file not found at {MODEL_PATH}. Please run train.py first.")
+        print(f"Model file not found at {MODEL_PATH}.")
