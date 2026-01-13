@@ -9,7 +9,7 @@ class Encoder(nn.Module):
         
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
         
-        # Bidirectional LSTM: Captures context from both beginning and end of code
+        # Bidirectional LSTM captures context from both beginning and end of code
         self.lstm = nn.LSTM(embedding_dim, 
                             hidden_dim, 
                             num_layers=n_layers, 

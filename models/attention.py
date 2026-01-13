@@ -4,7 +4,7 @@ import torch.nn.functional as F
 class Attention(nn.Module):
     def __init__(self, enc_hidden_dim, dec_hidden_dim):
         super().__init__()
-        # Attention mechanism: Calculates relationship between decoder's hidden state and encoder outputs
+
         self.attn = nn.Linear((enc_hidden_dim * 2) + dec_hidden_dim, dec_hidden_dim)
         self.v = nn.Linear(dec_hidden_dim, 1, bias=False)
 

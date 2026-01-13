@@ -13,13 +13,12 @@ class Seq2Seq(nn.Module):
         batch_size = source.shape[0]
         target_len = target.shape[1]
         
-        # Get encoder outputs
+        # encoder outputs
         encoder_outputs, hidden, cell = self.encoder(source)
         
         # First input token (<SOS>)
         input_step = target[:, 0]
         
-        # Use list instead of 'outputs' tensor for memory efficiency
         all_outputs = []
 
         for t in range(1, target_len):

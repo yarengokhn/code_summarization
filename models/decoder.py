@@ -25,7 +25,7 @@ class AttentionDecoder(nn.Module):
         input_step = input_step.unsqueeze(1)  # [batch_size, 1]
         embedded = self.dropout(self.embedding(input_step))
         
-        # Calculate attention (using top layer hidden state)
+        # Attention calculating 
         a = self.attention(hidden[-1], encoder_outputs).unsqueeze(1)
         
         # Context vector: [batch_size, 1, enc_hidden_dim * 2]
