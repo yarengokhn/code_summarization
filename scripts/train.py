@@ -8,7 +8,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence
 
-# Add parent directory to path for module imports
+# parent directory to path for module imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,7 +74,7 @@ def train_epoch(model, iterator, optimizer, criterion, clip, scaler):
         epoch_loss += loss.item()
         
         # Progress
-        if (i + 1) % 50 == 0:
+        if (i + 1) % 50== 0:
             elapsed = time.time() - start_time
             avg_loss = epoch_loss / (i + 1)
             print(f'  Batch {i+1}/{len(iterator)} | Loss: {avg_loss:.3f} | Time: {elapsed:.1f}s')
@@ -83,7 +83,7 @@ def train_epoch(model, iterator, optimizer, criterion, clip, scaler):
         if (i + 1) % 100 == 0 and torch.cuda.is_available():
             torch.cuda.empty_cache()
     
-    return epoch_loss / len(iterator)
+    return epoch_loss / len(iterator) 
 
 # ============ EVALUATION FUNCTION ============
 def evaluate(model, iterator, criterion):
@@ -128,8 +128,8 @@ EMB_DIM = 128
 HID_DIM = 128
 CLIP = 1.0
 
-TRAIN_SIZE = 150000
-VALID_SIZE = 15000
+TRAIN_SIZE = 1000
+VALID_SIZE = 100
 NUM_EPOCHS = 10
 
 subset_train = tokenized_dataset['train'].select(range(TRAIN_SIZE))  
@@ -204,38 +204,38 @@ print(f'✨ Training complete!')
 print(f'📊 Best validation loss: {best_valid_loss:.3f}')
 print(f'{"="*60}')
 
-# Quick inference test
-print("\n🧪 Testing inference...")
-model.load_state_dict(torch.load('models/best-model.pt'))
-model.eval()
+# # Quick inference test
+# print("\n🧪 Testing inference...")
+# model.load_state_dict(torch.load('models/best-model.pt'))
+# model.eval()
 
-test_code = "def add(x, y): return x + y"
-print(f"\nInput code: {test_code}")
+# test_code = "def add(x, y): return x + y"
+# print(f"\nInput code: {test_code}")
 
-with torch.no_grad():
-    # Preprocess
-    cleaned = preprocess_code(test_code, is_code=True)
-    tokens = tokenizer.encode(cleaned, return_tensors='pt', 
-                             truncation=True, max_length=128).to(DEVICE)
+# with torch.no_grad():
+#     # Preprocess
+#     cleaned = preprocess_code(test_code, is_code=True)
+#     tokens = tokenizer.encode(cleaned, return_tensors='pt', 
+#                              truncation=True, max_length=128).to(DEVICE)
     
-    # Encode
-    encoder_outputs, hidden, cell = model.encoder(tokens)
+#     # Encode
+#     encoder_outputs, hidden, cell = model.encoder(tokens)
     
-    # Decode
-    input_step = torch.LongTensor([tokenizer.cls_token_id]).to(DEVICE)
-    result_tokens = []
+#     # Decode
+#     input_step = torch.LongTensor([tokenizer.cls_token_id]).to(DEVICE)
+#     result_tokens = []
     
-    for _ in range(30):
-        output, hidden, cell, _ = model.decoder(input_step, hidden, cell, encoder_outputs)
-        top1 = output.argmax(1)
+#     for _ in range(30):
+#         output, hidden, cell, _ = model.decoder(input_step, hidden, cell, encoder_outputs)
+#         top1 = output.argmax(1)
         
-        if top1.item() == tokenizer.sep_token_id:
-            break
+#         if top1.item() == tokenizer.sep_token_id:
+#             break
         
-        result_tokens.append(top1.item())
-        input_step = top1
+#         result_tokens.append(top1.item())
+#         input_step = top1
     
-    summary = tokenizer.decode(result_tokens, skip_special_tokens=True)
-    print(f"Generated summary: {summary}")
+#     summary = tokenizer.decode(result_tokens, skip_special_tokens=True)
+#     print(f"Generated summary: {summary}")
 
-print("\n✅ All done!")
+# print("\n✅ All done!")

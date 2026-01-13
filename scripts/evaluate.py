@@ -176,7 +176,7 @@ if not os.path.exists(model_path):
 else:
     # Prepare test data
     print("📊 Loading test data...")
-    test_subset = tokenized_dataset['test'].select(range(15000))
+    test_subset = tokenized_dataset['test'].select(range(100))
     
     test_iterator = DataLoader(
         test_subset, 
