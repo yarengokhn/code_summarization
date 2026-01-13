@@ -6,6 +6,7 @@ from torch.cuda.amp import autocast
 from torchmetrics.text.rouge import ROUGEScore
 from torchmetrics.text.bleu import BLEUScore
 from tqdm import tqdm
+from data_loader import tokenized_dataset, tokenizer
 import os
 
 # Device setup
