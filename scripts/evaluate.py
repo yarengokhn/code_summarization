@@ -15,6 +15,7 @@ src_path = os.path.join(project_root, 'src')
 sys.path.insert(0, src_path)
 sys.path.insert(0, project_root)
 from data_loader import tokenized_dataset, tokenizer
+from models import Encoder, AttentionDecoder, Seq2Seq
 
 # Device setup
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
