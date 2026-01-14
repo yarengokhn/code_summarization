@@ -61,16 +61,17 @@ def train_epoch(model, iterator, optimizer, criterion, clip, scaler):
             loss = criterion(output, trg)
         
         # Backward pass
+        #scaler is only useful for CUDA (GPU)
         if scaler and torch.cuda.is_available():
             scaler.scale(loss).backward()
             scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
-            scaler.step(optimizer)
-            scaler.update()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), clip) # prevent exploding gradients
+            scaler.step(optimizer) # update weights
+            scaler.update() # update scaler
         else:
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
-            optimizer.step()
+            optimizer.step() # update weights
         
         epoch_loss += loss.item()
         
@@ -91,13 +92,15 @@ def evaluate(model, iterator, criterion):
     
     model.eval()
     epoch_loss = 0
-    
+
+    # no gradient update: we are not changing weights 
     with torch.no_grad():
         for batch in iterator:
             src = batch['input_ids'].to(DEVICE)
             trg = batch['labels'].to(DEVICE)
             
             # Mixed precision evaluation
+            # forward pass
             with torch.amp.autocast('cuda' if torch.cuda.is_available() else 'cpu', enabled=torch.cuda.is_available()):
                 output = model(src, trg, teacher_forcing_ratio=0)
                 
@@ -123,7 +126,7 @@ if torch.cuda.is_available():
     torch.cuda.empty_cache()
 
 # Hyperparameters
-INPUT_DIM = tokenizer.vocab_size
+INPUT_DIM = tokenizer.vocab_size 
 OUTPUT_DIM = tokenizer.vocab_size
 EMB_DIM = 128
 HID_DIM = 128
@@ -164,9 +167,10 @@ model = Seq2Seq(enc, dec, DEVICE).to(DEVICE)
 
 # Optimizer & Criterion
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
-
+#prediction error
 criterion = nn.CrossEntropyLoss(ignore_index=tokenizer.pad_token_id)
-# Scaler 
+
+#for mixed precision stability
 scaler = torch.amp.GradScaler('cuda') if torch.cuda.is_available() else None
 
 # Model save directory
