@@ -45,6 +45,7 @@ def train_epoch(model, iterator, optimizer, criterion, clip, scaler):
         src = batch['input_ids'].to(DEVICE)
         trg = batch['labels'].to(DEVICE)
         
+        #reset gradients 
         optimizer.zero_grad()
         
         # Mixed precision forward pass
@@ -163,8 +164,9 @@ model = Seq2Seq(enc, dec, DEVICE).to(DEVICE)
 
 # Optimizer & Criterion
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
+
 criterion = nn.CrossEntropyLoss(ignore_index=tokenizer.pad_token_id)
-# Scaler is only useful for CUDA
+# Scaler 
 scaler = torch.amp.GradScaler('cuda') if torch.cuda.is_available() else None
 
 # Model save directory
@@ -176,6 +178,7 @@ print("\n🎯 Training starting...\n")
 best_valid_loss = float('inf')
 
 for epoch in range(NUM_EPOCHS):
+
     print(f'{"="*60}')
     print(f'📈 Epoch {epoch+1}/{NUM_EPOCHS}')
     print(f'{"="*60}')
@@ -203,39 +206,3 @@ print(f'{"="*60}')
 print(f'✨ Training complete!')
 print(f'📊 Best validation loss: {best_valid_loss:.3f}')
 print(f'{"="*60}')
-
-# # Quick inference test
-# print("\n🧪 Testing inference...")
-# model.load_state_dict(torch.load('models/best-model.pt'))
-# model.eval()
-
-# test_code = "def add(x, y): return x + y"
-# print(f"\nInput code: {test_code}")
-
-# with torch.no_grad():
-#     # Preprocess
-#     cleaned = preprocess_code(test_code, is_code=True)
-#     tokens = tokenizer.encode(cleaned, return_tensors='pt', 
-#                              truncation=True, max_length=128).to(DEVICE)
-    
-#     # Encode
-#     encoder_outputs, hidden, cell = model.encoder(tokens)
-    
-#     # Decode
-#     input_step = torch.LongTensor([tokenizer.cls_token_id]).to(DEVICE)
-#     result_tokens = []
-    
-#     for _ in range(30):
-#         output, hidden, cell, _ = model.decoder(input_step, hidden, cell, encoder_outputs)
-#         top1 = output.argmax(1)
-        
-#         if top1.item() == tokenizer.sep_token_id:
-#             break
-        
-#         result_tokens.append(top1.item())
-#         input_step = top1
-    
-#     summary = tokenizer.decode(result_tokens, skip_special_tokens=True)
-#     print(f"Generated summary: {summary}")
-
-# print("\n✅ All done!")
